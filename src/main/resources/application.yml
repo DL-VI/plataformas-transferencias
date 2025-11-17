@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: banking-api
+  r2dbc:
+    url: ${DATABASE_URL:r2dbc:postgresql://localhost:5432/banking_db}
+    username: ${DATABASE_USER:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+
+server:
+  port: ${PORT:8080}
