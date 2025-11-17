@@ -1,9 +1,9 @@
--- Drop tables if they exist
-DROP TABLE IF EXISTS transfers;
-DROP TABLE IF EXISTS accounts;
+-- Drop tables if they exist (with CASCADE to handle foreign keys)
+DROP TABLE IF EXISTS transfers CASCADE;
+DROP TABLE IF EXISTS accounts CASCADE;
 
 -- Create accounts table
-CREATE TABLE IF NOT EXISTS accounts (
+CREATE TABLE accounts (
     id SERIAL PRIMARY KEY,
     account_number VARCHAR(50) UNIQUE NOT NULL,
     owner_name VARCHAR(100) NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS accounts (
 );
 
 -- Create transfers table
-CREATE TABLE IF NOT EXISTS transfers (
+CREATE TABLE transfers (
     id SERIAL PRIMARY KEY,
     source_account_id BIGINT NOT NULL,
     destination_account_id BIGINT NOT NULL,
@@ -26,8 +26,15 @@ CREATE TABLE IF NOT EXISTS transfers (
     FOREIGN KEY (destination_account_id) REFERENCES accounts(id)
 );
 
--- Insert sample data
-INSERT INTO accounts (account_number, owner_name, balance, currency) VALUES
-    ('ACC-001', 'Juan Pérez', 5000000.00, 'COP'),
-    ('ACC-002', 'María García', 3000000.00, 'COP'),
-    ('ACC-003', 'Carlos López', 7500000.00, 'COP');
+-- Insert sample data (only if not exists)
+INSERT INTO accounts (account_number, owner_name, balance, currency) 
+SELECT 'ACC-001', 'Juan Pérez', 5000000.00, 'COP'
+WHERE NOT EXISTS (SELECT 1 FROM accounts WHERE account_number = 'ACC-001');
+
+INSERT INTO accounts (account_number, owner_name, balance, currency) 
+SELECT 'ACC-002', 'María García', 3000000.00, 'COP'
+WHERE NOT EXISTS (SELECT 1 FROM accounts WHERE account_number = 'ACC-002');
+
+INSERT INTO accounts (account_number, owner_name, balance, currency) 
+SELECT 'ACC-003', 'Carlos López', 7500000.00, 'COP'
+WHERE NOT EXISTS (SELECT 1 FROM accounts WHERE account_number = 'ACC-003');
